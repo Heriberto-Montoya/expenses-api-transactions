@@ -1,0 +1,41 @@
+server:
+  port: 8002
+  servlet:
+    context-path: /
+
+spring:
+  application:
+    name: expenses-api-transactions
+  data:
+    mongodb:
+      uri: "${SPRING_DATA_MONGODB_URI:mongodb://localhost:27017/}"
+      database: "${SPRING_DATA_MONGODB_DATABASE:expenses}"
+  rabbitmq:
+    host: "${SPRING_RABBITMQ_HOST:localhost}"
+    port: "${SPRING_RABBITMQ_PORT:5672}"
+    username: "${SPRING_RABBITMQ_USERNAME:guest}"
+    password: "${SPRING_RABBITMQ_PASSWORD:guest}"
+  amqp:
+    deserialization:
+      trust:
+        all: true
+
+# Used for test, it logs queries
+logging:
+  level:
+    org:
+      springframework:
+        orm:
+          jpa: DEBUG
+        transaction: DEBUG
+        data:
+          mongodb:
+            core:
+              ReactiveMongoTemplate: DEBUG
+              MongoTemplate: DEBUG
+      hibernate:
+        SQL: DEBUG
+        type:
+          descriptor:
+            sql:
+              BasicBinder: TRACE
