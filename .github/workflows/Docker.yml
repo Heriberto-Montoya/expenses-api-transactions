@@ -45,7 +45,7 @@ jobs:
         username: ${{ secrets.DOCKER_HUB_USERNAME }}
         password: ${{ secrets.DOCKER_HUB_PASWORD }}
     - name: Push image to Docker Hub
-      run: docker push developitl/expenses-api-transactions:${{ github.run_number }}
+      run: docker push developitl/expenses-api-transactions:${{ env.POM_VERSION }}
   deploy:
     name: Deploy to kubernetes
     runs-on: [self-hosted, linux]
