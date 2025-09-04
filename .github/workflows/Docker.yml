@@ -10,13 +10,16 @@ jobs:
 
   build:
     name: Building Docker Image
-    runs-on: ubuntu-latest
+    runs-on: [ self-hosted, linux ]
     steps:
     - uses: actions/checkout@v4
+    - name: Get pom version
+      run: |
+        echo "POM_VERSION=$(./mvnw org.apache.maven.plugins:maven-help-plugin:3.1.0:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_ENV
     - name: Build the Docker image
       run: |
-        docker build . --file Dockerfile --tag  developitl/expenses-api-transactions:${{ github.run_number }}
-        docker save developitl/expenses-api-transactions:${{ github.run_number }} -o expenses-api-transactions.tar
+        docker build . --file Dockerfile --tag  developitl/expenses-api-transactions:${{ env.POM_VERSION }}
+        docker save developitl/expenses-api-transactions:${{ env.POM_VERSION }} -o expenses-api-transactions.tar
     - name: Upload Docker Image Artifact
       uses: actions/upload-artifact@v4
       with:
@@ -24,7 +27,7 @@ jobs:
         path: expenses-api-transactions.tar
   push:
     name: Publish Docker Image
-    runs-on: ubuntu-latest
+    runs-on: [ self-hosted, linux ]
     needs: [build]
     steps:
     - name: Download Docker Image Artifact
@@ -40,5 +43,13 @@ jobs:
       with:
         username: ${{ secrets.DOCKER_HUB_USERNAME }}
         password: ${{ secrets.DOCKER_HUB_PASWORD }}
-    - name: Push image to Docekr Hub
+    - name: Push image to Docker Hub
       run: docker push developitl/expenses-api-transactions:${{ github.run_number }}
+  deploy:
+    name: Deploy to kubernetes
+    runs-on: [self-hosted, linux]
+    needs: [push]
+    steps:
+      - name: Get source code
+        uses: actions/checkout@v4
+
