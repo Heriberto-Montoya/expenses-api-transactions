@@ -3,19 +3,20 @@ name: Docker Image CI
 on:
   push:
     branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
-
 jobs:
 
   build:
     name: Building Docker Image
-    runs-on: [ self-hosted, linux ]
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
+    - name: Install maven
+      run: |
+        sudo apt update
+        sudo apt install maven -y
     - name: Get pom version
       run: |
-        echo "POM_VERSION=$(./mvnw org.apache.maven.plugins:maven-help-plugin:3.1.0:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_ENV
+        echo "POM_VERSION=$(mvn org.apache.maven.plugins:maven-help-plugin:3.1.0:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_ENV
     - name: Build the Docker image
       run: |
         docker build . --file Dockerfile --tag  developitl/expenses-api-transactions:${{ env.POM_VERSION }}
@@ -27,7 +28,7 @@ jobs:
         path: expenses-api-transactions.tar
   push:
     name: Publish Docker Image
-    runs-on: [ self-hosted, linux ]
+    runs-on: ubuntu-latest
     needs: [build]
     steps:
     - name: Download Docker Image Artifact
@@ -51,5 +52,5 @@ jobs:
     needs: [push]
     steps:
       - name: Get source code
-        uses: actions/checkout@v4
+        run: echo $PROFILE
 
