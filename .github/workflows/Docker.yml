@@ -56,13 +56,14 @@ jobs:
     needs: [push]
     steps:
       - uses: actions/checkout@v4
-      - name: Get pom version Modify Image Tag in Deployment File
-        run: |
-          chmod +x mvnw
-          export TAG=(./mvnw org.apache.maven.plugins:maven-help-plugin:3.1.0:evaluate -Dexpression=project.version -q -DforceStdout)
-          envsubst < expenses-api-transactions-deployments.yaml
-      - name: Replace Docker Image TAG
-        run: |
-          kubectl apply -f expenses-api-transactions-deployments.yaml
-          kubectl get pods
+      - name: Permissions to mvnw file
+        run: chmod +x mvnw
+      - name: Export TAG Variable
+        run: export TAG=(./mvnw org.apache.maven.plugins:maven-help-plugin:3.1.0:evaluate -Dexpression=project.version -q -DforceStdout)
+      - name: Replace TAG Variable in deployment
+        run: envsubst < expenses-api-transactions-deployments.yaml
+      - name: Apply deployment
+        run: kubectl apply -f expenses-api-transactions-deployments.yaml
+      - name: Get running pods
+        run: kubectl get pods
 
