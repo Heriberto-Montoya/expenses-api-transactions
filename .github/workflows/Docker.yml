@@ -60,8 +60,9 @@ jobs:
         run: chmod +x mvnw
       - name: Export TAG Variable
         run: |
-          export TAG=(./mvnw org.apache.maven.plugins:maven-help-plugin:3.1.0:evaluate -Dexpression=project.version -q -DforceStdout)
-          echo $TAG
+          echo "TAG=$(mvn org.apache.maven.plugins:maven-help-plugin:3.1.0:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_ENV
+          echo ${{env.TAG}}
+          export TAG='${{env.TAG}}'
       - name: Replace TAG Variable in deployment
         run: envsubst < expenses-api-transactions-deployments.yaml
       - name: Apply deployment
