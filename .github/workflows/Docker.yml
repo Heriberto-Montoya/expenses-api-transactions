@@ -5,62 +5,61 @@ on:
     branches: [ "main" ]
 jobs:
 
-#  build:
-#    name: Building Docker Image
-#    runs-on: ubuntu-latest
-#    steps:
-#    - uses: actions/checkout@v4
-#    - name: Install maven
-#      run: |
-#        sudo apt update
-#        sudo apt install maven -y
-#    - name: Get pom version
-#      run: |
-#        echo "POM_VERSION=$(mvn org.apache.maven.plugins:maven-help-plugin:3.1.0:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_ENV
-#    - name: Build the Docker image
-#      run: |
-#        docker build . --file Dockerfile --tag  developitl/expenses-api-transactions:${{ env.POM_VERSION }}
-#        docker save developitl/expenses-api-transactions:${{ env.POM_VERSION }} -o expenses-api-transactions.tar
-#    - name: Upload Docker Image Artifact
-#      uses: actions/upload-artifact@v4
-#      with:
-#        name: docker-image-artifact
-#        path: expenses-api-transactions.tar
-#  push:
-#    name: Publish Docker Image
-#    runs-on: ubuntu-latest
-#    needs: [build]
-#    steps:
-#    - uses: actions/checkout@v4
-#    - name: Download Docker Image Artifact
-#      uses: actions/download-artifact@v4
-#      with:
-#        name: docker-image-artifact
-#    - name: Load Docker Image
-#      run: |
-#        docker load -i expenses-api-transactions.tar
-#        docker images
-#    - uses: docker/login-action@v3.5.0
-#      name: Login to Docker Hub
-#      with:
-#        username: ${{ secrets.DOCKER_HUB_USERNAME }}
-#        password: ${{ secrets.DOCKER_HUB_PASWORD }}
-#    - name: Get pom version
-#      run: |
-#        echo "POM_VERSION=$(mvn org.apache.maven.plugins:maven-help-plugin:3.1.0:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_ENV
-#    - name: Push image to Docker Hub
-#      run: docker push developitl/expenses-api-transactions:${{ env.POM_VERSION }}
+  build:
+    name: Building Docker Image
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Install maven
+      run: |
+        sudo apt update
+        sudo apt install maven -y
+    - name: Get pom version
+      run: |
+        echo "POM_VERSION=$(mvn org.apache.maven.plugins:maven-help-plugin:3.1.0:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_ENV
+    - name: Build the Docker image
+      run: |
+        docker build . --file Dockerfile --tag  developitl/expenses-api-transactions:${{ env.POM_VERSION }}
+        docker save developitl/expenses-api-transactions:${{ env.POM_VERSION }} -o expenses-api-transactions.tar
+    - name: Upload Docker Image Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: docker-image-artifact
+        path: expenses-api-transactions.tar
+  push:
+    name: Publish Docker Image
+    runs-on: ubuntu-latest
+    needs: [build]
+    steps:
+    - uses: actions/checkout@v4
+    - name: Download Docker Image Artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: docker-image-artifact
+    - name: Load Docker Image
+      run: |
+        docker load -i expenses-api-transactions.tar
+        docker images
+    - uses: docker/login-action@v3.5.0
+      name: Login to Docker Hub
+      with:
+        username: ${{ secrets.DOCKER_HUB_USERNAME }}
+        password: ${{ secrets.DOCKER_HUB_PASWORD }}
+    - name: Get pom version
+      run: |
+        echo "POM_VERSION=$(mvn org.apache.maven.plugins:maven-help-plugin:3.1.0:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_ENV
+    - name: Push image to Docker Hub
+      run: docker push developitl/expenses-api-transactions:${{ env.POM_VERSION }}
   deploy:
     name: Deploy to kubernetes
     runs-on: [self-hosted, linux]
-    #needs: [push]
+    needs: [push]
     steps:
       - uses: actions/checkout@v4
       - name: Permissions to mvnw file
         run: chmod +x mvnw
-      - name: Export TAG Variable
+      - name: Deploy Kubernetes
         run: |
-          ./mvnw org.apache.maven.plugins:maven-help-plugin:3.1.0:evaluate -Dexpression=project.version -q -DforceStdout
           export TAG=$(./mvnw org.apache.maven.plugins:maven-help-plugin:3.1.0:evaluate -Dexpression=project.version -q -DforceStdout)
           envsubst < expenses-api-transactions-deployments.yaml | kubectl apply -f -
           kubectl get pods
