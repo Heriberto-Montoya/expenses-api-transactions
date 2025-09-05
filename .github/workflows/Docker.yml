@@ -55,6 +55,9 @@ jobs:
     runs-on: [self-hosted, linux]
     needs: [push]
     steps:
-      - name: Get source code
-        run: echo $PROFILE
+      - uses: actions/checkout@v4
+      - name: List Directory
+        run: |
+          pwd
+          ls -l
 
