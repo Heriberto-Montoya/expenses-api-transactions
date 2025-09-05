@@ -59,11 +59,10 @@ jobs:
       - name: Get pom version
         run: |
           chmod +x mvnw
-          echo "POM_VERSION=$(./mvnw org.apache.maven.plugins:maven-help-plugin:3.1.0:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_ENV
-      - name: List Directory
+          export TAG=$(./mvnw org.apache.maven.plugins:maven-help-plugin:3.1.0:evaluate -Dexpression=project.version -q -DforceStdout)
+      - name: Modify Image Tag in Deployment File
         run: |
-          pwd
-          ls -l
+          envsubst < expenses-api-transactions-deployments.yamls > expenses-api-transactions-deployments.yaml
       - name: Replace Docker Image TAG
         run: |
           kubectl apply -f expenses-api-transactions-deployments.yaml

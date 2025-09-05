@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: expenses-api-transactions
-          image: developitl/expenses-api-transactions:${env:TAG}
+          image: developitl/expenses-api-transactions:${TAG}
           ports:
             - containerPort: 8002
           env:
