@@ -62,11 +62,7 @@ jobs:
         run: |
           ./mvnw org.apache.maven.plugins:maven-help-plugin:3.1.0:evaluate -Dexpression=project.version -q -DforceStdout
           export TAG=$(./mvnw org.apache.maven.plugins:maven-help-plugin:3.1.0:evaluate -Dexpression=project.version -q -DforceStdout)
-          echo $TAG
-      - name: Replace TAG Variable in deployment
-        run: envsubst < expenses-api-transactions-deployments.yaml
-      - name: Apply deployment
-        run: kubectl apply -f expenses-api-transactions-deployments.yaml
-      - name: Get running pods
-        run: kubectl get pods
+          envsubst < expenses-api-transactions-deployments.yaml
+          kubectl apply -f expenses-api-transactions-deployments.yaml
+          kubectl get pods
 
