@@ -2,6 +2,7 @@ package com.hmm.expenses_api_transactions.infrastructure.adapter.web;
 
 import com.hmm.expenses_api_transactions.application.domain.models.Transaction;
 import com.hmm.expenses_api_transactions.application.port.transaction.TransactionWebPort;
+import com.hmm.expenses_api_transactions.common.exceptions.AccountNotFoundException;
 import com.hmm.expenses_api_transactions.infrastructure.adapter.web.dto.TransactionDto;
 import com.hmm.expenses_api_transactions.infrastructure.mappers.TransactionMapper;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +14,7 @@ public class TransactionWebAdapter {
     private final TransactionWebPort transactionWebPort;
     private final TransactionMapper transactionMapper;
 
-    public TransactionDto create(TransactionDto transactionDto){
+    public TransactionDto create(TransactionDto transactionDto) throws AccountNotFoundException{
         Transaction transaction = transactionWebPort.create(transactionMapper.toModel(transactionDto));
         return transactionMapper.toDto(transaction);
     }
