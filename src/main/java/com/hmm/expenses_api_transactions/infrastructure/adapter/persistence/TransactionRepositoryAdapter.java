@@ -27,7 +27,7 @@ public class TransactionRepositoryAdapter implements TransactionRepositoryPort {
         expense.setTransaction_date(LocalDate.now());
 
         Optional<TransactionDocument> existingTransaction = transactionRepository.findById(expense.getAccountId());
-        if(existingTransaction.isEmpty()) throw new AccountNotFoundException("The account with id " + expense.getAccountId() + " does not exist.");
+        if(existingTransaction.isEmpty()) throw new AccountNotFoundException("The account with id " + expense.getAccountId() + " does not exist. ");
 
         TransactionDocument expenseDocument = transactionRepository.save(transactionMapper.toDocument(expense));
         transactionProducer.sendTransaction(transactionMapper.toModel(expenseDocument));
