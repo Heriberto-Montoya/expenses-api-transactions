@@ -26,8 +26,8 @@ public class TransactionRepositoryAdapter implements TransactionRepositoryPort {
         if(expense.getAmount() <= 0) throw new InvalidAmountException("The transaction amount cannot be less than or equal to zero.");
         expense.setTransaction_date(LocalDate.now());
 
-        Optional<TransactionDocument> existingTransaction = transactionRepository.findById(expense.getId());
-        if(existingTransaction.isEmpty()) throw new AccountNotFoundException("The account with id " + expense.getId() + " does not exist.");
+        Optional<TransactionDocument> existingTransaction = transactionRepository.findById(expense.getAccountId());
+        if(existingTransaction.isEmpty()) throw new AccountNotFoundException("The account with id " + expense.getAccountId() + " does not exist.");
 
         TransactionDocument expenseDocument = transactionRepository.save(transactionMapper.toDocument(expense));
         transactionProducer.sendTransaction(transactionMapper.toModel(expenseDocument));
